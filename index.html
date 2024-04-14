@@ -19,6 +19,14 @@
     .explode {
       animation: explode 0.5s ease-out;
     }
+    .gif-container {
+      display: flex;
+      justify-content: center;
+    }
+    .gif-container iframe {
+      width: 300px;
+      height: 300px;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen flex items-center justify-center">
@@ -41,6 +49,7 @@
     <div id="score-container" class="mt-8 text-center hidden">
       <p id="score-message" class="text-3xl font-bold text-white mb-4"></p>
       <div id="star-container" class="flex justify-center mb-4"></div>
+      <div id="gif-container" class="gif-container mb-4"></div>
       <button id="restart-btn" class="bg-blue-500 text-white px-6 py-3 rounded-full text-xl font-semibold mt-4 transform hover:scale-110 transition-transform duration-200">Restart Game</button>
     </div>
     <div id="progress" class="mt-8 text-center">
@@ -107,8 +116,8 @@
         answer: "Myth"
       },
       {
-        question: "Legato and staccato are types of articulation.",
-        answer: "Fact"
+        question: "Smoking has no detrimental effects on vocal health.",
+        answer: "Myth"
       }
     ];
 
@@ -125,6 +134,7 @@
     const scoreContainer = document.getElementById("score-container");
     const scoreMessage = document.getElementById("score-message");
     const starContainer = document.getElementById("star-container");
+    const gifContainer = document.getElementById("gif-container");
     const restartButton = document.getElementById("restart-btn");
     const progressElement = document.getElementById("current-question");
     const scoreCountElement = document.getElementById("score-count");
@@ -157,11 +167,15 @@
 
       if (score === questions.length) {
         scoreMessage.innerText = "Great job! You got every question correct.";
+        createStarExplosion();
+        showGif("https://giphy.com/embed/3o7qDRmFdvJ3Rk1wYw");
       } else if (percentage >= 70) {
         scoreMessage.innerText = "You passed! However, there's still room for improvement. Would you like to try again?";
         createStarExplosion();
+        showGif("https://giphy.com/embed/3o7qDRmFdvJ3Rk1wYw");
       } else {
         scoreMessage.innerText = `You scored ${score} out of ${questions.length}. Would you like to try again?`;
+        showGif("https://giphy.com/embed/vOxiC0rt7hbs4");
       }
     }
 
@@ -173,6 +187,18 @@
         star.style.left = `${Math.random() * 100}%`;
         starContainer.appendChild(star);
       }
+    }
+
+    function showGif(url) {
+      const iframe = document.createElement("iframe");
+      iframe.src = url;
+      iframe.width = "300";
+      iframe.height = "300";
+      iframe.frameBorder = "0";
+      iframe.classList.add("giphy-embed");
+      iframe.allowFullscreen = true;
+      gifContainer.innerHTML = "";
+      gifContainer.appendChild(iframe);
     }
 
     function nextQuestion() {
@@ -196,6 +222,7 @@
       scoreContainer.style.display = "none";
       questionContainer.style.display = "block";
       starContainer.innerHTML = "";
+      gifContainer.innerHTML = "";
     }
 
     mythButton.addEventListener("click", () => {
