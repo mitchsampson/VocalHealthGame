@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vocal Health Mythbusters</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes explode {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+    .explode {
+      animation: explode 0.5s ease-out;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen flex items-center justify-center">
   <div class="container mx-auto px-4 py-8">
@@ -16,12 +31,16 @@
         <button id="fact-btn" class="bg-green-500 text-white px-6 py-3 rounded-full text-xl font-semibold transform hover:scale-110 transition-transform duration-200">Fact</button>
       </div>
     </div>
+    <div id="score-display" class="mt-4 text-center">
+      <p class="text-white text-xl font-semibold">Score: <span id="score-count">0</span> / <span id="total-count">15</span></p>
+    </div>
     <div id="result-container" class="mt-8 text-center hidden">
       <p id="result" class="text-xl text-white"></p>
       <button id="next-btn" class="bg-blue-500 text-white px-6 py-3 rounded-full text-xl font-semibold mt-4 transform hover:scale-110 transition-transform duration-200">Next Question</button>
     </div>
     <div id="score-container" class="mt-8 text-center hidden">
-      <p id="score" class="text-3xl font-bold text-white"></p>
+      <p id="score-message" class="text-3xl font-bold text-white mb-4"></p>
+      <div id="star-container" class="flex justify-center mb-4"></div>
       <button id="restart-btn" class="bg-blue-500 text-white px-6 py-3 rounded-full text-xl font-semibold mt-4 transform hover:scale-110 transition-transform duration-200">Restart Game</button>
     </div>
     <div id="progress" class="mt-8 text-center">
@@ -104,9 +123,12 @@
     const resultElement = document.getElementById("result");
     const nextButton = document.getElementById("next-btn");
     const scoreContainer = document.getElementById("score-container");
-    const scoreElement = document.getElementById("score");
+    const scoreMessage = document.getElementById("score-message");
+    const starContainer = document.getElementById("star-container");
     const restartButton = document.getElementById("restart-btn");
     const progressElement = document.getElementById("current-question");
+    const scoreCountElement = document.getElementById("score-count");
+    const totalCountElement = document.getElementById("total-count");
 
     function showQuestion() {
       questionElement.innerText = questions[currentQuestion].question;
@@ -122,13 +144,35 @@
       } else {
         resultElement.innerText = "Incorrect!";
       }
+
+      scoreCountElement.innerText = score;
     }
 
     function showScore() {
       scoreContainer.style.display = "block";
       resultContainer.style.display = "none";
       questionContainer.style.display = "none";
-      scoreElement.innerText = `Your score: ${score} out of ${questions.length}`;
+
+      const percentage = Math.round((score / questions.length) * 100);
+
+      if (score === questions.length) {
+        scoreMessage.innerText = "Great job! You got every question correct.";
+      } else if (percentage >= 70) {
+        scoreMessage.innerText = "You passed! However, there's still room for improvement. Would you like to try again?";
+        createStarExplosion();
+      } else {
+        scoreMessage.innerText = `You scored ${score} out of ${questions.length}. Would you like to try again?`;
+      }
+    }
+
+    function createStarExplosion() {
+      for (let i = 0; i < 20; i++) {
+        const star = document.createElement("div");
+        star.classList.add("w-4", "h-4", "bg-yellow-300", "rounded-full", "absolute", "explode");
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        starContainer.appendChild(star);
+      }
     }
 
     function nextQuestion() {
@@ -146,10 +190,12 @@
     function restartGame() {
       currentQuestion = 0;
       score = 0;
+      scoreCountElement.innerText = 0;
       progressElement.innerText = 1;
       showQuestion();
       scoreContainer.style.display = "none";
       questionContainer.style.display = "block";
+      starContainer.innerHTML = "";
     }
 
     mythButton.addEventListener("click", () => {
@@ -166,6 +212,7 @@
     restartButton.addEventListener("click", restartGame);
 
     showQuestion();
+    totalCountElement.innerText = questions.length;
   </script>
 </body>
 </html>
